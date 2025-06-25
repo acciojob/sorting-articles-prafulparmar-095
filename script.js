@@ -6,46 +6,29 @@ document.addEventListener('DOMContentLoaded', () => {
         'Anywhere But Here', 'An Old Dog'
     ];
 
-    // Function to remove articles ("a", "an", "the") from the beginning of a string
-    function stripArticle(bandName) {
-        // Regex to match "a ", "an ", or "the " at the beginning of the string, case-insensitive
-        return bandName.replace(/^(a |an |the )/i, '').trim();
+    // Function to clean band names for sorting
+    function getSortKey(bandName) {
+        // Convert to lowercase to ensure case-insensitive sorting
+        const lowerCaseName = bandName.toLowerCase();
+        // Remove 'a ', 'an ', 'the ' from the beginning
+        // Use a regular expression with a word boundary (\b) to match whole words
+        // and 'i' flag for case-insensitive matching.
+        return lowerCaseName.replace(/^(a |an |the )\b/, '').trim();
     }
 
-    // Create a new array of objects where each object contains the original band name
-    // and its stripped version for sorting. This is often what test cases look for.
-    const processedBands = bands.map(band => ({
-        original: band,
-        stripped: stripArticle(band)
-    }));
-
-    // Sort the processed bands based on their 'stripped' property
-    const sortedProcessedBands = processedBands.sort((a, b) => {
-        return a.stripped.localeCompare(b.stripped);
+    // Sort the bands
+    bands.sort((a, b) => {
+        const sortKeyA = getSortKey(a);
+        const sortKeyB = getSortKey(b);
+        return sortKeyA.localeCompare(sortKeyB); // Use localeCompare for proper alphabetical sorting
     });
 
-    // Get the unordered list element
-    const bandList = document.getElementById('band-list');
+    const ulElement = document.getElementById('bands');
 
-    // Populate the list using the original band names from the sorted array of objects
-    sortedProcessedBands.forEach(bandObj => {
-        const listItem = document.createElement('li');
-        listItem.textContent = bandObj.original; // Display the original name
-        // Optional: Add a data attribute for testing if needed
-        // listItem.dataset.strippedName = bandObj.stripped;
-        bandList.appendChild(listItem);
+    // Populate the unordered list
+    bands.forEach(band => {
+        const li = document.createElement('li');
+        li.textContent = band;
+        ulElement.appendChild(li);
     });
-
-    // IMPORTANT FOR TESTING SYSTEMS:
-    // If the test system is directly evaluating a global variable or a function's return,
-    // you might need to make the sorted array accessible.
-    // For example, if the test runner expects `window.sortedBandList` to be the final array:
-    // window.sortedBandList = sortedProcessedBands.map(bandObj => bandObj.original);
-    // Or if it expects `window.getSortedBands()`:
-    // window.getSortedBands = () => sortedProcessedBands.map(bandObj => bandObj.original);
-    // Or if the problem implies returning the sorted array in a specific function,
-    // ensure that function does so.
-    // Without specific instructions on what the "5 keys" refer to or how the test evaluates,
-    // this is the most robust way to ensure the sorting logic is correct and the original
-    // values are displayed.
 });
